@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Publish your gutenberg-typist stats to the leaderboard.
 #   1. In Vim:  :GT export
-#   2.          :!~/.gt-stats/submit      (or run it from a shell)
+#   2.          :!~/.gt-hub/submit      (or run it from a shell)
 # First run asks for your GitHub username and caches it in git config.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -31,4 +31,4 @@ if ! git push -q; then
   echo "push rejected (someone pushed first) — run submit again" >&2
   exit 1
 fi
-echo "pushed — live at https://5x5x5x5.github.io/gutenberg-typist-stats/ in ~1 minute"
+echo "pushed — live at https://5x5x5x5.github.io/gutenberg-typist-hub/ in ~1 minute"
