@@ -1,9 +1,9 @@
-# gutenberg-typist stats
+# gutenberg-typist hub
 
 Typing leaderboard for the [gutenberg-typist](https://github.com/5x5x5x5/gutenberg-typist)
 Vim plugin.
 
-**The board: <https://5x5x5x5.github.io/gutenberg-typist-stats/>**
+**The board: <https://5x5x5x5.github.io/gutenberg-typist-hub/>**
 
 ## Join the board
 
@@ -13,14 +13,14 @@ One-time setup:
 2. Clone:
 
    ```sh
-   git clone git@github.com:5x5x5x5/gutenberg-typist-stats.git ~/.gt-stats
+   git clone git@github.com:5x5x5x5/gutenberg-typist-hub.git ~/.gt-hub
    ```
 
 ## Submit your stats
 
 ```vim
 :GT export
-:!~/.gt-stats/submit
+:!~/.gt-hub/submit
 ```
 
 That's it — live on the board about a minute later. The first run asks for your
@@ -29,7 +29,7 @@ GitHub username (cached in git config); your stats live in `bundles/<you>.json`.
 Handy mapping for your vimrc:
 
 ```vim
-nnoremap <leader>gp :GT export<CR>:!~/.gt-stats/submit<CR>
+nnoremap <leader>gp :GT export<CR>:!~/.gt-hub/submit<CR>
 ```
 
 Submissions **merge**: counters are combined per machine by field-wise max, so
