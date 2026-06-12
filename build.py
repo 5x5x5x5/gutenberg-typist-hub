@@ -26,10 +26,12 @@ ROOT = Path(__file__).resolve().parent
 BUNDLES = ROOT / "bundles"
 SITE = ROOT / "site"
 OUT = ROOT / "_site"
+DENYLIST = ROOT / "denylist.txt"
 
 FORMAT_VERSION = 1
 MAX_BUNDLE_BYTES = 1_000_000
 SUSPICIOUS_WPM = 250
+MAX_MACHINE_ID_CHARS = 40
 
 Counters = dict[str, int]
 Machines = dict[str, Counters]
@@ -80,12 +82,22 @@ def as_int(value: object) -> int | None:
     return number if number >= 0 else None
 
 
+def sanitize_machine_id(machine_id: str) -> str:
+    """Machine ids are user-controlled free text shown verbatim on the board:
+    cap the length and drop non-printable characters before display."""
+    cleaned = "".join(ch for ch in machine_id if ch.isprintable()).strip()
+    return cleaned[:MAX_MACHINE_ID_CHARS]
+
+
 def clean_machines(raw: object) -> Machines:
     machines: Machines = {}
     if not isinstance(raw, dict):
         return machines
-    for machine_id, record in raw.items():
-        if not isinstance(machine_id, str) or machine_id == "" or not isinstance(record, dict):
+    for raw_id, record in raw.items():
+        if not isinstance(raw_id, str) or not isinstance(record, dict):
+            continue
+        machine_id = sanitize_machine_id(raw_id)
+        if machine_id == "":
             continue
         clean: Counters = {}
         for key, value in record.items():
@@ -194,10 +206,28 @@ def derive(user: str, bundle: CleanBundle) -> Row:
     }
 
 
-def collect(bundles_dir: Path = BUNDLES) -> tuple[list[Row], list[Skipped]]:
+def load_denylist(path: Path = DENYLIST) -> set[str]:
+    if not path.exists():
+        return set()
+    entries: set[str] = set()
+    for line in path.read_text().splitlines():
+        entry = line.strip().lower()
+        if entry and not entry.startswith("#"):
+            entries.add(entry)
+    return entries
+
+
+def collect(
+    bundles_dir: Path = BUNDLES, denylist: set[str] | None = None
+) -> tuple[list[Row], list[Skipped]]:
+    if denylist is None:
+        denylist = load_denylist()
     rows: list[Row] = []
     skipped: list[Skipped] = []
     for path in sorted(bundles_dir.glob("*.json")):
+        if path.stem.lower() in denylist:
+            skipped.append({"user": path.stem, "reason": "denylisted"})
+            continue
         row: Row | None = None
         try:
             bundle, error = load_bundle(path)
@@ -225,7 +255,9 @@ def build(
         shutil.rmtree(out_dir)
     shutil.copytree(site_dir, out_dir)
     payload = {"generated_at": int(time.time()), "users": rows, "skipped": skipped}
-    (out_dir / "data.json").write_text(json.dumps(payload, indent=1) + "\n")
+    # Compact separators: data.json is machine-read; indentation roughly
+    # doubles the raw payload for nothing.
+    (out_dir / "data.json").write_text(json.dumps(payload, separators=(",", ":")) + "\n")
     print(f"built {out_dir.name}: {len(rows)} user(s), {len(skipped)} skipped")
     for item in skipped:
         print(f"  skipped {item['user']}: {item['reason']}")

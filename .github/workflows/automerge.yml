@@ -17,6 +17,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write # to dispatch deploy after merging
 
 jobs:
   automerge:
@@ -25,6 +26,9 @@ jobs:
       github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     steps:
+      # Checks out the BASE repo's default branch (our code, never PR code) —
+      # only needed to read denylist.txt.
+      - uses: actions/checkout@v4
       - name: Merge if the PR only updates its author's own bundle
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -38,6 +42,10 @@ jobs:
             exit 0
           fi
           author=$(gh api "repos/$REPO/pulls/$pr" --jq '.user.login')
+          if grep -qix "$author" denylist.txt 2>/dev/null; then
+            echo "author $author is denylisted — leaving PR #$pr for human review"
+            exit 0
+          fi
           files_json=$(gh api "repos/$REPO/pulls/$pr/files" --paginate)
           count=$(printf '%s' "$files_json" | jq 'length')
           file=$(printf '%s' "$files_json" | jq -r '.[0].filename // empty')
@@ -52,5 +60,14 @@ jobs:
             exit 0
           fi
           echo "auto-merging PR #$pr ($expected by $author)"
+          # sha guard: merge ONLY the commit validate actually validated.
+          # Without it, content pushed after the green check would merge
+          # unvalidated (TOCTOU); GitHub returns 409 on mismatch and the
+          # new push's own validate run re-triggers this workflow.
           gh api -X PUT "repos/$REPO/pulls/$pr/merge" -f merge_method=merge \
+            -f sha="$HEAD_SHA" \
             -f commit_title="stats: $author (#$pr)"
+          # Merges made with GITHUB_TOKEN do not fire push-triggered
+          # workflows, so dispatch the deploy explicitly or bot-merged
+          # stats never reach the board.
+          gh workflow run deploy.yml --ref main
