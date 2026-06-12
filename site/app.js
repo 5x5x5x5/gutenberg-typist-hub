@@ -13,7 +13,14 @@ const COLUMNS = [
   { key: "exported_at", label: "updated", fmt: relativeTime },
 ];
 
-let state = { rows: [], sortKey: "best_wpm", dir: -1, open: new Set() };
+let state = {
+  rows: [],
+  sortKey: "best_wpm",
+  dir: -1,
+  open: new Set(),
+  filter: "",
+  total: 0,
+};
 
 function relativeTime(epoch) {
   if (!epoch) return "—";
@@ -130,11 +137,22 @@ function foldCell(row) {
   return cell;
 }
 
+function visibleRows() {
+  if (!state.filter) return state.rows;
+  const needle = state.filter.toLowerCase();
+  return state.rows.filter((row) => row.user.toLowerCase().includes(needle));
+}
+
 function renderBody(tbody) {
   tbody.replaceChildren();
-  state.rows.forEach((row, i) => {
+  visibleRows().forEach((row, i) => {
     const tr = el("tr", { className: "row" });
-    if (i === 0 && state.sortKey === "best_wpm" && state.dir === -1)
+    if (
+      i === 0 &&
+      state.sortKey === "best_wpm" &&
+      state.dir === -1 &&
+      !state.filter
+    )
       tr.classList.add("leader");
     const caret = el("td", {}, [
       el("span", {
@@ -191,16 +209,50 @@ function render() {
   const table = document.getElementById("board");
   renderHead(table.querySelector("thead"));
   renderBody(table.querySelector("tbody"));
+  const shown = visibleRows().length;
+  document.getElementById("count").textContent = state.filter
+    ? `${shown}/${state.total} shown`
+    : `${state.total} on the board`;
 }
 
 function renderModeline(data) {
-  const parts = [`${data.users.length} on the board`];
+  const parts = [];
   if (data.skipped.length) {
-    const detail = data.skipped.map((s) => `${s.user}: ${s.reason}`).join(", ");
-    parts.push(`${data.skipped.length} skipped (${detail})`);
+    // Cap the list: with many users a pile-up of bad bundles must not
+    // turn the modeline into a wall of text.
+    const shown = data.skipped
+      .slice(0, 3)
+      .map((s) => `${s.user}: ${s.reason}`)
+      .join(", ");
+    const more =
+      data.skipped.length > 3 ? ` +${data.skipped.length - 3} more` : "";
+    parts.push(`${data.skipped.length} skipped (${shown}${more})`);
   }
   parts.push("generated " + relativeTime(data.generated_at));
   document.getElementById("meta").textContent = parts.join(" · ");
+}
+
+// Vim-style "/" filter: slash focuses the filter box, Escape clears it.
+function initFilter() {
+  const input = document.getElementById("filter");
+  input.addEventListener("input", () => {
+    state.filter = input.value.trim();
+    render();
+  });
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      input.value = "";
+      state.filter = "";
+      input.blur();
+      render();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "/" && document.activeElement !== input) {
+      event.preventDefault();
+      input.focus();
+    }
+  });
 }
 
 fetch("data.json")
@@ -210,12 +262,16 @@ fetch("data.json")
   })
   .then((data) => {
     state.rows = data.users;
+    state.total = data.users.length;
     renderModeline(data);
     if (!data.users.length) {
       document.getElementById("empty").hidden = false;
+      document.getElementById("count").textContent = "0 on the board";
       return;
     }
     document.getElementById("board").hidden = false;
+    document.getElementById("filterwrap").hidden = false;
+    initFilter();
     render();
   })
   .catch(() => {

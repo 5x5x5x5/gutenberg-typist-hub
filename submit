@@ -3,8 +3,15 @@
 #   1. In Vim:  :GT export
 #   2.          :!~/.gt-hub/submit      (or run it from a shell)
 # First run asks for your GitHub username and caches it in git config.
+#
+# Works in two layouts:
+#   collaborator: origin = 5x5x5x5/gutenberg-typist-hub (direct push)
+#   fork:         origin = your fork, upstream = canonical repo; submissions
+#                 go up as a PR that auto-merges once validation passes.
 set -euo pipefail
 cd "$(dirname "$0")"
+
+CANONICAL="5x5x5x5/gutenberg-typist-hub"
 
 EXPORT="${1:-$HOME/gutenberg-typist-export.json}"
 if [ ! -f "$EXPORT" ]; then
@@ -22,10 +29,20 @@ if [ -z "$USERNAME" ]; then
   git config gt.username "$USERNAME"
 fi
 
+UPSTREAM=origin
+if git remote get-url upstream >/dev/null 2>&1; then
+  UPSTREAM=upstream
+fi
+
+# This clone exists to publish stats; always operate on main, whatever
+# branch a fork's default HEAD or an experiment left checked out.
+git switch -q main 2>/dev/null || git checkout -q main
+
 # --rebase, not --ff-only: after a lost push race the local commit must be
 # replayed on top of the other user's push. Each user only ever touches
 # their own bundles/<user>.json, so the rebase cannot conflict across users.
-git pull --rebase --quiet
+git fetch -q "$UPSTREAM"
+git pull --rebase --quiet "$UPSTREAM" main
 python3 build.py --merge "bundles/$USERNAME.json" "$EXPORT"
 python3 build.py --summary "$USERNAME"
 git add "bundles/$USERNAME.json"
@@ -35,12 +52,28 @@ fi
 
 # Push anything unpushed — including a commit left behind by an earlier
 # run that lost a push race.
-if [ "$(git rev-list --count @{u}..HEAD)" -eq 0 ]; then
+if [ "$(git rev-list --count "$UPSTREAM/main"..HEAD)" -eq 0 ]; then
   echo "nothing new to publish"
   exit 0
 fi
-if ! git push -q; then
-  echo "push rejected (someone pushed first) — run submit again" >&2
-  exit 1
+
+if [ "$UPSTREAM" = "origin" ]; then
+  if ! git push -q; then
+    echo "push rejected (someone pushed first) — run submit again" >&2
+    exit 1
+  fi
+  echo "pushed — live at https://5x5x5x5.github.io/gutenberg-typist-hub/ in ~1 minute"
+else
+  git push -q origin HEAD:main
+  if command -v gh >/dev/null 2>&1; then
+    # An already-open PR just gets updated by the push; create is a no-op then.
+    gh pr create --repo "$CANONICAL" --base main \
+      --title "stats: $USERNAME" \
+      --body "automated stats submission via ./submit" 2>/dev/null \
+      || echo "existing PR updated"
+    echo "PR up — auto-merges when validation passes, live ~2 minutes after"
+  else
+    echo "pushed to your fork — open (or refresh) your PR here:"
+    echo "  https://github.com/$CANONICAL/compare/main...$USERNAME:gutenberg-typist-hub:main"
+  fi
 fi
-echo "pushed — live at https://5x5x5x5.github.io/gutenberg-typist-hub/ in ~1 minute"

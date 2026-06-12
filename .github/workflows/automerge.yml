@@ -1,0 +1,56 @@
+name: automerge
+# Merges a PR automatically when BOTH hold:
+#   1. validate completed successfully for the PR's head commit
+#   2. the PR changes exactly one file: bundles/<pr-author>.json
+#      (added or modified only — a rename could smuggle a code deletion)
+# This is what lets anyone join the board by fork + PR with no invite and
+# no push access. PRs touching anything else wait for human review.
+#
+# Security note: triggered via workflow_run so it runs in the base repo's
+# context, and it never checks out or executes PR code — all judgments are
+# made from the GitHub API's view of the PR.
+on:
+  workflow_run:
+    workflows: [validate]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge if the PR only updates its author's own bundle
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          pr=$(gh api "repos/$REPO/commits/$HEAD_SHA/pulls" --jq '.[0].number // empty')
+          if [ -z "$pr" ]; then
+            echo "no open PR for $HEAD_SHA; nothing to do"
+            exit 0
+          fi
+          author=$(gh api "repos/$REPO/pulls/$pr" --jq '.user.login')
+          files_json=$(gh api "repos/$REPO/pulls/$pr/files" --paginate)
+          count=$(printf '%s' "$files_json" | jq 'length')
+          file=$(printf '%s' "$files_json" | jq -r '.[0].filename // empty')
+          status=$(printf '%s' "$files_json" | jq -r '.[0].status // empty')
+          expected="bundles/${author}.json"
+          lc() { printf '%s' "$1" | tr '[:upper:]' '[:lower:]'; }
+          if [ "$count" != "1" ] \
+            || [ "$(lc "$file")" != "$(lc "$expected")" ] \
+            || { [ "$status" != "added" ] && [ "$status" != "modified" ]; }; then
+            echo "PR #$pr is not a self-bundle-only update" \
+              "($count file(s), first: $file/$status, author: $author) — leaving for human review"
+            exit 0
+          fi
+          echo "auto-merging PR #$pr ($expected by $author)"
+          gh api -X PUT "repos/$REPO/pulls/$pr/merge" -f merge_method=merge \
+            -f commit_title="stats: $author (#$pr)"

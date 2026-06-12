@@ -304,3 +304,12 @@ def test_collect_turns_unexpected_exceptions_into_skips(
     rows, skipped = build.collect(tmp_path)
     assert rows == []
     assert skipped == [{"user": "alice", "reason": "unexpected error (RuntimeError)"}]
+
+
+def test_check_validates_specific_files(tmp_path: Path) -> None:
+    good = write_bundle(tmp_path / "alice.json", make_bundle())
+    bad = tmp_path / "bob.json"
+    bad.write_text("not json")
+    assert build.check([good]) == 0
+    assert build.check([good, bad]) == 1
+    assert build.check([tmp_path / "missing.json"]) == 1

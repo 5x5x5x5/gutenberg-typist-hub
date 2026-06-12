@@ -10,9 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: python3 -m pip install pytest
       - run: python3 -m pytest -q
-      - run: python3 build.py --strict
+      # Full build must not crash (hard requirement), but pre-existing bad
+      # bundles on main must not fail someone else's PR — so the build runs
+      # non-strict, and strict validation applies only to bundles this PR
+      # touches.
+      - run: python3 build.py
+      - name: Validate bundles changed by this PR
+        run: |
+          changed=$(git diff --name-only --diff-filter=d \
+            "origin/${{ github.base_ref }}"...HEAD -- 'bundles/*.json')
+          if [ -n "$changed" ]; then
+            # shellcheck disable=SC2086
+            python3 build.py --check $changed
+          else
+            echo "no bundle changes"
+          fi
