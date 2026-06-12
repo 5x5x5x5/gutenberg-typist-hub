@@ -42,12 +42,17 @@ function el(tag, props = {}, children = []) {
 
 function sortRows() {
   const { sortKey, dir } = state;
+  const byUser = (a, b) =>
+    a.user.localeCompare(b.user, "en", { sensitivity: "base" });
   state.rows.sort((a, b) => {
     const av = a[sortKey],
       bv = b[sortKey];
-    if (av === bv) return a.user < b.user ? -1 : 1;
-    if (typeof av === "string") return av < bv ? dir : -dir;
-    return av < bv ? dir : -dir;
+    const cmp =
+      typeof av === "string"
+        ? av.localeCompare(bv, "en", { sensitivity: "base" })
+        : av - bv;
+    // dir = 1 ascending, -1 descending; equal values tiebreak by username.
+    return cmp !== 0 ? cmp * dir : byUser(a, b);
   });
 }
 

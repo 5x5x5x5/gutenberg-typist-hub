@@ -14,6 +14,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import math
 import shutil
 import sys
 import time
@@ -70,6 +71,10 @@ def as_int(value: object) -> int | None:
     """
     if isinstance(value, bool) or not isinstance(value, int | float):
         return None
+    if isinstance(value, float) and not math.isfinite(value):
+        # json.loads happily produces inf (1e400) and nan (NaN literal);
+        # round() raises on both, which would take down the whole build.
+        return None
     number = round(value)
     return number if number >= 0 else None
 
@@ -96,7 +101,13 @@ def clean_sessions(raw: object) -> Sessions:
     if not isinstance(raw, dict):
         return sessions
     for book_id, record in raw.items():
-        if not isinstance(book_id, str) or not book_id.isdigit() or not isinstance(record, dict):
+        if (
+            not isinstance(book_id, str)
+            # ASCII digits only, mirroring the plugin's '^\d\+$' — isdigit()
+            # alone accepts characters like '²' that int() then rejects.
+            or not (book_id.isascii() and book_id.isdigit())
+            or not isinstance(record, dict)
+        ):
             continue
         offset = as_int(record.get("offset"))
         if offset is None:
@@ -186,11 +197,18 @@ def collect(bundles_dir: Path = BUNDLES) -> tuple[list[Row], list[Skipped]]:
     rows: list[Row] = []
     skipped: list[Skipped] = []
     for path in sorted(bundles_dir.glob("*.json")):
-        bundle, error = load_bundle(path)
-        if bundle is None:
+        row: Row | None = None
+        try:
+            bundle, error = load_bundle(path)
+            if bundle is not None:
+                row = derive(path.stem, bundle)
+        except Exception as err:  # defense in depth for the one hard requirement:
+            # no single bundle may ever take down the build for everyone.
+            error = f"unexpected error ({err.__class__.__name__})"
+        if row is None:
             skipped.append({"user": path.stem, "reason": error or "invalid"})
         else:
-            rows.append(derive(path.stem, bundle))
+            rows.append(row)
     rows.sort(key=lambda row: (-row["best_wpm"], row["user"]))
     return rows, skipped
 
