@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gutenberg-typist — leaderboard</title>
+<meta name="description" content="Typing stats leaderboard for the gutenberg-typist Vim plugin.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <h1><span class="accent">gutenberg-typist</span> leaderboard<span class="cursor">&#9646;</span></h1>
+  <p class="tagline">type the classics &middot; compare the damage</p>
+  <nav>
+    <a href="https://github.com/5x5x5x5/gutenberg-typist">plugin</a>
+    <span class="sep">&middot;</span>
+    <a href="https://github.com/5x5x5x5/gutenberg-typist-stats#join-the-board">join the board</a>
+  </nav>
+</header>
+
+<main>
+  <div class="buffer">
+    <div class="buffer-title">~/.gt-stats/board</div>
+    <div class="table-wrap">
+      <table id="board" hidden>
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+      <div id="empty" hidden>
+        <pre class="tildes">
+~
+~      No stats on the board yet.
+~
+~      In Vim:   :GT export
+~      Then:     ./submit
+~
+~      You could be first.
+~
+</pre>
+      </div>
+      <div id="error" hidden>
+        <pre class="tildes">
+~
+~      E484: Can't open file data.json
+~
+~      The board failed to load — try a refresh.
+~
+</pre>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="modeline">
+  <span id="mode">-- NORMAL --</span>
+  <span id="meta"></span>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
