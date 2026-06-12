@@ -7,14 +7,23 @@ Vim plugin.
 
 ## Join the board
 
-One-time setup:
+No invite needed — fork, clone your fork, point `upstream` at this repo:
 
-1. Ask [@5x5x5x5](https://github.com/5x5x5x5) for push access (or fork and submit by PR).
-2. Clone:
+```sh
+gh repo fork 5x5x5x5/gutenberg-typist-hub --clone ~/.gt-hub
+# or without gh: fork in the GitHub UI, then
+git clone git@github.com:<you>/gutenberg-typist-hub.git ~/.gt-hub
+cd ~/.gt-hub && git remote add upstream git@github.com:5x5x5x5/gutenberg-typist-hub.git
+```
 
-   ```sh
-   git clone git@github.com:5x5x5x5/gutenberg-typist-hub.git ~/.gt-hub
-   ```
+(`gh repo fork --clone` sets `upstream` for you.)
+
+Your submissions go up as pull requests that **merge themselves**: a bot merges
+any PR that only updates `bundles/<your-username>.json` and passes validation.
+No waiting on a human.
+
+Collaborators with push access can clone this repo directly instead — `submit`
+detects which layout you have.
 
 ## Submit your stats
 
@@ -23,8 +32,9 @@ One-time setup:
 :!~/.gt-hub/submit
 ```
 
-That's it — live on the board about a minute later. The first run asks for your
-GitHub username (cached in git config); your stats live in `bundles/<you>.json`.
+That's it — live on the board a minute or two later. The first run asks for
+your GitHub username (cached in git config); your stats live in
+`bundles/<you>.json`.
 
 Handy mapping for your vimrc:
 
@@ -56,7 +66,10 @@ bundles/*.json  --build.py-->  _site/data.json + static page  --Actions-->  GitH
   metrics, and writes `_site/`. Malformed bundles are skipped and listed on
   the page — they never break the board.
 - Pushing to `main` triggers `.github/workflows/deploy.yml`, which rebuilds
-  and deploys Pages. PRs run `validate.yml`, which fails on invalid bundles.
+  and deploys Pages. PRs run `validate.yml`, which strict-checks exactly the
+  bundles the PR touches.
+- `automerge.yml` lands validated PRs automatically when they change only
+  the author's own bundle file; anything else waits for human review.
 - Every submission is a commit, so git history is a free time-series for
   future charts.
 
