@@ -256,3 +256,51 @@ def test_summary_reports_rank(tmp_path: Path, capsys: pytest.CaptureFixture[str]
     out = capsys.readouterr().out
     assert "rank 1 of 1" in out
     assert build.summary("ghost", tmp_path) == 1
+
+
+# ── review findings: crash resistance ───────────────────────────────────────
+
+
+def test_as_int_rejects_non_finite() -> None:
+    assert build.as_int(float("inf")) is None
+    assert build.as_int(float("-inf")) is None
+    assert build.as_int(float("nan")) is None
+
+
+def test_clean_sessions_rejects_unicode_digit_keys() -> None:
+    # '²'.isdigit() is True but int('²') raises; '٤٣٠٠' would parse to 4300
+    # but the plugin's '^\d\+$' rejects it — mirror that exactly.
+    sessions = build.clean_sessions(
+        {"²": {"offset": 1}, "٤٣٠٠": {"offset": 2}, "4300": {"offset": 3}}
+    )
+    assert list(sessions) == ["4300"]
+
+
+def test_collect_survives_nan_infinity_and_unicode_bundles(tmp_path: Path) -> None:
+    write_bundle(tmp_path / "alice.json", make_bundle())
+    (tmp_path / "nan.json").write_text(
+        '{"format_version": 1, "machines": {"m": {"total_chars": NaN}}, "sessions": {}}'
+    )
+    (tmp_path / "inf.json").write_text(
+        '{"format_version": 1, "machines": {"m": {"total_chars": 1e400}}, "sessions": {}}'
+    )
+    sup2 = make_bundle(sessions={"²": {"offset": 1}})
+    write_bundle(tmp_path / "unicode.json", sup2)
+    rows, skipped = build.collect(tmp_path)
+    users = [r["user"] for r in rows]
+    assert "alice" in users and "unicode" in users  # unicode session dropped, bundle kept
+    assert {s["user"] for s in skipped} == {"nan", "inf"}  # junk-only machines skipped
+
+
+def test_collect_turns_unexpected_exceptions_into_skips(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    write_bundle(tmp_path / "alice.json", make_bundle())
+
+    def boom(user: str, bundle: build.CleanBundle) -> build.Row:
+        raise RuntimeError("anything at all")
+
+    monkeypatch.setattr(build, "derive", boom)
+    rows, skipped = build.collect(tmp_path)
+    assert rows == []
+    assert skipped == [{"user": "alice", "reason": "unexpected error (RuntimeError)"}]

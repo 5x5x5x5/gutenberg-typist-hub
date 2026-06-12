@@ -15,18 +15,30 @@ fi
 USERNAME="$(git config gt.username || true)"
 if [ -z "$USERNAME" ]; then
   read -rp "GitHub username: " USERNAME
+  if ! printf '%s' "$USERNAME" | grep -qE '^[A-Za-z0-9-]+$'; then
+    echo "'$USERNAME' is not a valid GitHub username (letters, digits, dashes)" >&2
+    exit 1
+  fi
   git config gt.username "$USERNAME"
 fi
 
-git pull --ff-only
+# --rebase, not --ff-only: after a lost push race the local commit must be
+# replayed on top of the other user's push. Each user only ever touches
+# their own bundles/<user>.json, so the rebase cannot conflict across users.
+git pull --rebase --quiet
 python3 build.py --merge "bundles/$USERNAME.json" "$EXPORT"
 python3 build.py --summary "$USERNAME"
 git add "bundles/$USERNAME.json"
-if git diff --cached --quiet; then
+if ! git diff --cached --quiet; then
+  git commit -q -m "stats: $USERNAME"
+fi
+
+# Push anything unpushed — including a commit left behind by an earlier
+# run that lost a push race.
+if [ "$(git rev-list --count @{u}..HEAD)" -eq 0 ]; then
   echo "nothing new to publish"
   exit 0
 fi
-git commit -q -m "stats: $USERNAME"
 if ! git push -q; then
   echo "push rejected (someone pushed first) — run submit again" >&2
   exit 1
