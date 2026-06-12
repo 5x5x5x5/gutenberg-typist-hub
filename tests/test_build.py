@@ -140,6 +140,7 @@ def test_load_bundle_rejects_bad_input(tmp_path: Path) -> None:
         ("v2.json", json.dumps(make_bundle(format_version=2))),
         ("noversion.json", json.dumps({"machines": {}})),
         ("nomachines.json", json.dumps(make_bundle(machines={"m": {"x": "junk"}}))),
+        ("recursionbomb.json", "[" * 50_000 + "]" * 50_000),
     ]
     for name, content in cases:
         path = tmp_path / name
