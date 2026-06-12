@@ -1,0 +1,201 @@
+/* Dracula palette, matched to the gutenberg-typist landing page */
+:root {
+  --bg: #0d1117;
+  --bg-surface: #151b23;
+  --surface: #282a36;
+  --surface-light: #343746;
+  --border: #44475a;
+  --fg: #f8f8f2;
+  --fg-muted: #6272a4;
+  --green: #50fa7b;
+  --red: #ff5555;
+  --purple: #bd93f9;
+  --cyan: #8be9fd;
+  --yellow: #f1fa8c;
+  --orange: #ffb86c;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Consolas,
+    'Liberation Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-mono);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--purple); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Header ─────────────────────────────────────── */
+
+.topbar {
+  text-align: center;
+  padding: 48px 16px 24px;
+  position: relative;
+}
+
+.topbar::before {
+  content: '';
+  position: absolute;
+  inset: -80px 0 auto;
+  height: 280px;
+  background: radial-gradient(ellipse at top, rgba(80, 250, 123, 0.07), transparent 70%);
+  pointer-events: none;
+}
+
+.topbar h1 { font-size: clamp(1.3rem, 4vw, 2rem); font-weight: 700; }
+.topbar .accent { color: var(--green); }
+
+.cursor {
+  color: var(--fg);
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.tagline { color: var(--fg-muted); margin: 6px 0 10px; font-size: 0.9rem; }
+.topbar nav { font-size: 0.85rem; }
+.sep { color: var(--fg-muted); margin: 0 8px; }
+
+/* ── The buffer ─────────────────────────────────── */
+
+main {
+  flex: 1;
+  width: min(1020px, calc(100% - 32px));
+  margin: 0 auto 32px;
+}
+
+.buffer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+.buffer-title {
+  background: var(--surface-light);
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+  padding: 5px 14px;
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+
+.table-wrap { overflow-x: auto; }
+
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  color: var(--fg-muted);
+  font-weight: 600;
+  text-align: right;
+  padding: 10px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+}
+thead th:hover { color: var(--fg); }
+thead th.sorted { color: var(--green); }
+thead th[data-key="user"] { text-align: left; }
+thead th.rank-col { cursor: default; }
+
+tbody td {
+  padding: 8px 14px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+td.rank {
+  color: var(--fg-muted);
+  text-align: right;
+  width: 1%;
+  user-select: none;
+}
+
+td.user { text-align: left; font-weight: 600; }
+tr.leader td.user a { color: var(--green); }
+
+tbody tr.row { cursor: pointer; }
+tbody tr.row:hover { background: var(--surface-light); }
+tbody tr.row:nth-child(4n+3) { background: rgba(255, 255, 255, 0.015); }
+
+.badge {
+  display: inline-block;
+  background: var(--yellow);
+  color: var(--bg);
+  font-weight: 700;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  padding: 0 5px;
+  margin-left: 6px;
+  cursor: help;
+}
+
+.muted { color: var(--fg-muted); }
+
+/* ── Fold (expanded detail row) ─────────────────── */
+
+tr.fold td {
+  background: var(--bg-surface);
+  border-top: 1px dashed var(--border);
+  border-bottom: 1px dashed var(--border);
+  text-align: left;
+  padding: 12px 18px 14px 44px;
+  white-space: normal;
+}
+
+.fold h4 {
+  color: var(--cyan);
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin: 8px 0 4px;
+  text-transform: lowercase;
+}
+.fold h4::before { content: '» '; color: var(--fg-muted); }
+
+.fold ul { list-style: none; font-size: 0.82rem; }
+.fold li { padding: 1px 0; color: var(--fg); }
+.fold li .muted { margin-left: 6px; }
+
+.caret { display: inline-block; width: 1em; color: var(--fg-muted); }
+
+/* ── Empty / error states ───────────────────────── */
+
+.tildes {
+  color: var(--purple);
+  opacity: 0.85;
+  padding: 18px 10px 22px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* ── Modeline footer ────────────────────────────── */
+
+.modeline {
+  background: var(--surface-light);
+  border-top: 1px solid var(--border);
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+  padding: 6px 16px;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.modeline #mode { color: var(--green); font-weight: 700; }
+
+@media (max-width: 640px) {
+  thead th, tbody td { padding: 8px 9px; }
+  table { font-size: 0.8rem; }
+}

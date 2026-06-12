@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Publish your gutenberg-typist stats to the leaderboard.
+#   1. In Vim:  :GT export
+#   2.          :!~/.gt-stats/submit      (or run it from a shell)
+# First run asks for your GitHub username and caches it in git config.
+set -euo pipefail
+cd "$(dirname "$0")"
+
+EXPORT="${1:-$HOME/gutenberg-typist-export.json}"
+if [ ! -f "$EXPORT" ]; then
+  echo "no export found at $EXPORT — run :GT export in Vim first" >&2
+  exit 1
+fi
+
+USERNAME="$(git config gt.username || true)"
+if [ -z "$USERNAME" ]; then
+  read -rp "GitHub username: " USERNAME
+  git config gt.username "$USERNAME"
+fi
+
+git pull --ff-only
+python3 build.py --merge "bundles/$USERNAME.json" "$EXPORT"
+python3 build.py --summary "$USERNAME"
+git add "bundles/$USERNAME.json"
+if git diff --cached --quiet; then
+  echo "nothing new to publish"
+  exit 0
+fi
+git commit -q -m "stats: $USERNAME"
+if ! git push -q; then
+  echo "push rejected (someone pushed first) — run submit again" >&2
+  exit 1
+fi
+echo "pushed — live at https://5x5x5x5.github.io/gutenberg-typist-stats/ in ~1 minute"
