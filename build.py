@@ -135,7 +135,10 @@ def load_bundle(path: Path) -> tuple[CleanBundle | None, str | None]:
         if path.stat().st_size > MAX_BUNDLE_BYTES:
             return None, "bundle larger than 1 MB"
         data: object = json.loads(path.read_text())
-    except (OSError, json.JSONDecodeError) as err:
+    except (OSError, ValueError, RecursionError) as err:
+        # ValueError covers JSONDecodeError and UnicodeDecodeError;
+        # RecursionError covers deeply-nested JSON bombs, which would
+        # otherwise escape and take down the whole build.
         return None, f"unreadable ({err.__class__.__name__})"
     if not isinstance(data, dict):
         return None, "not a JSON object"
