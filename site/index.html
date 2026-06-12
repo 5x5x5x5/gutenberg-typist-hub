@@ -21,7 +21,11 @@
 
 <main>
   <div class="buffer">
-    <div class="buffer-title">~/.gt-hub/board</div>
+    <div class="buffer-title">
+      <span>~/.gt-hub/board</span>
+      <span id="filterwrap" hidden>/<input id="filter" type="text"
+        placeholder="filter users" autocomplete="off" spellcheck="false"></span>
+    </div>
     <div class="table-wrap">
       <table id="board" hidden>
         <thead></thead>
@@ -54,6 +58,7 @@
 
 <footer class="modeline">
   <span id="mode">-- NORMAL --</span>
+  <span id="count"></span>
   <span id="meta"></span>
 </footer>
 

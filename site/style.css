@@ -87,7 +87,26 @@ main {
   padding: 5px 14px;
   border-bottom: 1px solid var(--border);
   user-select: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
 }
+
+#filterwrap { color: var(--green); }
+
+#filter {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  width: 130px;
+  caret-color: var(--green);
+}
+#filter::placeholder { color: var(--fg-muted); opacity: 0.6; }
+
+.modeline #count { color: var(--cyan); }
 
 .table-wrap { overflow-x: auto; }
 

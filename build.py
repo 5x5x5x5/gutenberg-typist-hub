@@ -9,6 +9,7 @@ Usage:
   build.py --strict             build; exit 1 if any bundle is invalid
   build.py --merge LOCAL EXPORT merge an export file into a user's bundle
   build.py --summary USER       print USER's derived stats and rank
+  build.py --check FILE...      validate specific bundle files (PR CI)
 """
 
 from __future__ import annotations
@@ -274,6 +275,20 @@ def summary(user: str, bundles_dir: Path = BUNDLES) -> int:
     return 1
 
 
+def check(paths: list[Path]) -> int:
+    """Validate specific bundle files (used by PR CI on just the changed files,
+    so one user's pre-existing bad bundle can't fail someone else's PR)."""
+    status = 0
+    for path in paths:
+        bundle, error = load_bundle(path)
+        if bundle is None:
+            print(f"INVALID {path}: {error}", file=sys.stderr)
+            status = 1
+        else:
+            print(f"ok {path}")
+    return status
+
+
 def main(argv: list[str]) -> int:
     args = argv[1:]
     if not args:
@@ -284,6 +299,8 @@ def main(argv: list[str]) -> int:
         return merge_into(Path(args[1]), Path(args[2]))
     if args[0] == "--summary" and len(args) == 2:
         return summary(args[1])
+    if args[0] == "--check" and len(args) >= 2:
+        return check([Path(p) for p in args[1:]])
     print(__doc__, file=sys.stderr)
     return 2
 
