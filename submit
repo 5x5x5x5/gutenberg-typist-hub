@@ -5,13 +5,13 @@
 # First run asks for your GitHub username and caches it in git config.
 #
 # Works in two layouts:
-#   collaborator: origin = 5x5x5x5/gutenberg-typist-hub (direct push)
+#   collaborator: origin = 5x5x5x5/typist-guild (direct push)
 #   fork:         origin = your fork, upstream = canonical repo; submissions
 #                 go up as a PR that auto-merges once validation passes.
 set -euo pipefail
 cd "$(dirname "$0")"
 
-CANONICAL="5x5x5x5/gutenberg-typist-hub"
+CANONICAL="5x5x5x5/typist-guild"
 
 EXPORT="${1:-$HOME/gutenberg-typist-export.json}"
 if [ ! -f "$EXPORT" ]; then
@@ -62,7 +62,7 @@ if [ "$UPSTREAM" = "origin" ]; then
     echo "push rejected (someone pushed first) — run submit again" >&2
     exit 1
   fi
-  echo "pushed — live at https://5x5x5x5.github.io/gutenberg-typist-hub/ in ~1 minute"
+  echo "pushed — live at https://5x5x5x5.github.io/typist-guild/ in ~1 minute"
 else
   git push -q origin HEAD:main
   if command -v gh >/dev/null 2>&1; then
@@ -74,6 +74,6 @@ else
     echo "PR up — auto-merges when validation passes, live ~2 minutes after"
   else
     echo "pushed to your fork — open (or refresh) your PR here:"
-    echo "  https://github.com/$CANONICAL/compare/main...$USERNAME:gutenberg-typist-hub:main"
+    echo "  https://github.com/$CANONICAL/compare/main...$USERNAME:typist-guild:main"
   fi
 fi

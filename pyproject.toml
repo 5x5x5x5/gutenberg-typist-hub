@@ -1,5 +1,5 @@
 [project]
-name = "gutenberg-typist-hub"
+name = "typist-guild"
 version = "0.1.0"
 description = "Leaderboard for the gutenberg-typist Vim plugin"
 requires-python = ">=3.12"

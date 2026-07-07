@@ -1,19 +1,21 @@
-# gutenberg-typist hub
+# typist guild
 
-Typing leaderboard for the [gutenberg-typist](https://github.com/5x5x5x5/gutenberg-typist)
-Vim plugin.
+The path: learn to touch type with [GNU gtypist](https://www.gnu.org/software/gtypist/),
+graduate to typing real books with the
+[gutenberg-typist](https://github.com/5x5x5x5/gutenberg-typist) Vim plugin,
+then put your stats on the board here.
 
-**The board: <https://5x5x5x5.github.io/gutenberg-typist-hub/>**
+**The board: <https://5x5x5x5.github.io/typist-guild/>**
 
 ## Join the board
 
 No invite needed — fork, clone your fork, point `upstream` at this repo:
 
 ```sh
-gh repo fork 5x5x5x5/gutenberg-typist-hub --clone ~/.gt-hub
+gh repo fork 5x5x5x5/typist-guild --clone ~/.gt-hub
 # or without gh: fork in the GitHub UI, then
-git clone git@github.com:<you>/gutenberg-typist-hub.git ~/.gt-hub
-cd ~/.gt-hub && git remote add upstream git@github.com:5x5x5x5/gutenberg-typist-hub.git
+git clone git@github.com:<you>/typist-guild.git ~/.gt-hub
+cd ~/.gt-hub && git remote add upstream git@github.com:5x5x5x5/typist-guild.git
 ```
 
 (`gh repo fork --clone` sets `upstream` for you.)

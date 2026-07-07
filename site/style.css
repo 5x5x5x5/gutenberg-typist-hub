@@ -190,6 +190,19 @@ tr.fold td {
 
 .caret { display: inline-block; width: 1em; color: var(--fg-muted); }
 
+/* ── The path (intro) ───────────────────────────── */
+
+.intro { margin-bottom: 22px; }
+
+.path {
+  list-style: none;
+  padding: 14px 18px 16px;
+  font-size: 0.88rem;
+}
+.path li { padding: 3px 0; }
+.path .step { color: var(--green); font-weight: 700; }
+.path code { color: var(--yellow); }
+
 /* ── Empty / error states ───────────────────────── */
 
 .tildes {
