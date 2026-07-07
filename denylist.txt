@@ -1,0 +1,4 @@
+# One GitHub username per line (case-insensitive). Listed users are skipped
+# by the board build and their PRs are never auto-merged.
+# This is the moderation lever: reverting a cheater without listing them here
+# just starts a revert war with their next auto-merged submission.

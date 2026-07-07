@@ -313,3 +313,44 @@ def test_check_validates_specific_files(tmp_path: Path) -> None:
     assert build.check([good]) == 0
     assert build.check([good, bad]) == 1
     assert build.check([tmp_path / "missing.json"]) == 1
+
+
+# ── scaling hardening: denylist, sanitization, compact output ───────────────
+
+
+def test_denylisted_user_skipped(tmp_path: Path) -> None:
+    write_bundle(tmp_path / "alice.json", make_bundle())
+    write_bundle(tmp_path / "Mallory.json", make_bundle())
+    rows, skipped = build.collect(tmp_path, denylist={"mallory"})
+    assert [r["user"] for r in rows] == ["alice"]
+    assert skipped == [{"user": "Mallory", "reason": "denylisted"}]
+
+
+def test_load_denylist_parses_comments_and_case(tmp_path: Path) -> None:
+    listfile = tmp_path / "denylist.txt"
+    listfile.write_text("# comment\n\nMallory\n  eve  \n")
+    assert build.load_denylist(listfile) == {"mallory", "eve"}
+    assert build.load_denylist(tmp_path / "absent.txt") == set()
+
+
+def test_machine_id_sanitized_for_display() -> None:
+    machines = build.clean_machines(
+        {
+            "x" * 100: {"total_chars": 1},
+            "evil\x07\x1b[31mname": {"total_chars": 2},
+            "\x07\x08": {"total_chars": 3},
+        }
+    )
+    assert set(machines) == {"x" * 40, "evil[31mname"}
+
+
+def test_data_json_is_compact(tmp_path: Path) -> None:
+    bundles = tmp_path / "bundles"
+    site = tmp_path / "site"
+    bundles.mkdir()
+    site.mkdir()
+    (site / "index.html").write_text("<html></html>")
+    write_bundle(bundles / "alice.json", make_bundle())
+    build.build(bundles_dir=bundles, site_dir=site, out_dir=tmp_path / "_site")
+    text = (tmp_path / "_site" / "data.json").read_text()
+    assert '": ' not in text and ", " not in text
