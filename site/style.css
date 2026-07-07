@@ -203,6 +203,16 @@ tr.fold td {
 .path .step { color: var(--green); font-weight: 700; }
 .path code { color: var(--yellow); }
 
+.path .install {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 6px 0;
+  font-size: 0.8rem;
+  overflow-x: auto;
+}
+
 /* ── Empty / error states ───────────────────────── */
 
 .tildes {
