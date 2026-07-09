@@ -1,0 +1,53 @@
+{
+ "format_version": 1,
+ "exported_at": 1783534172,
+ "machines": {
+  "work-mbp": {
+   "total_chars": 1794240,
+   "correct_chars": 1779886,
+   "total_time_seconds": 246758,
+   "sessions_count": 168,
+   "best_wpm": 109
+  },
+  "home-tower": {
+   "total_chars": 1569960,
+   "correct_chars": 1557400,
+   "total_time_seconds": 215914,
+   "sessions_count": 147,
+   "best_wpm": 100
+  },
+  "netbook": {
+   "total_chars": 1121400,
+   "correct_chars": 1112429,
+   "total_time_seconds": 150444,
+   "sessions_count": 105,
+   "best_wpm": 97
+  }
+ },
+ "sessions": {
+  "345": {
+   "offset": 853600,
+   "total_chars_typed": 904816,
+   "correct_chars": 897577,
+   "last_active": 1783529852
+  },
+  "1400": {
+   "offset": 897120,
+   "total_chars_typed": 950947,
+   "correct_chars": 943339,
+   "last_active": 1783011452
+  },
+  "98": {
+   "offset": 672840,
+   "total_chars_typed": 713210,
+   "correct_chars": 707504,
+   "last_active": 1782493052
+  },
+  "84": {
+   "offset": 417100,
+   "total_chars_typed": 442126,
+   "correct_chars": 438589,
+   "last_active": 1781974652
+  }
+ }
+}

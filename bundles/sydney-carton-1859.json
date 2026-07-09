@@ -1,0 +1,40 @@
+{
+ "format_version": 1,
+ "exported_at": 1783188572,
+ "machines": {
+  "office-dell": {
+   "total_chars": 909510,
+   "correct_chars": 880406,
+   "total_time_seconds": 152183,
+   "sessions_count": 107,
+   "best_wpm": 92
+  },
+  "thinkpad-t480": {
+   "total_chars": 389790,
+   "correct_chars": 377317,
+   "total_time_seconds": 65221,
+   "sessions_count": 46,
+   "best_wpm": 83
+  }
+ },
+ "sessions": {
+  "98": {
+   "offset": 766300,
+   "total_chars_typed": 812278,
+   "correct_chars": 786285,
+   "last_active": 1783184252
+  },
+  "1400": {
+   "offset": 324825,
+   "total_chars_typed": 344314,
+   "correct_chars": 333296,
+   "last_active": 1782665852
+  },
+  "2600": {
+   "offset": 194895,
+   "total_chars_typed": 206589,
+   "correct_chars": 199978,
+   "last_active": 1782147452
+  }
+ }
+}

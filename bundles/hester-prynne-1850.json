@@ -1,0 +1,21 @@
+{
+ "format_version": 1,
+ "exported_at": 1780682972,
+ "machines": {
+  "town-library-pc": {
+   "total_chars": 91200,
+   "correct_chars": 84542,
+   "total_time_seconds": 29088,
+   "sessions_count": 20,
+   "best_wpm": 47
+  }
+ },
+ "sessions": {
+  "33": {
+   "offset": 91200,
+   "total_chars_typed": 96672,
+   "correct_chars": 89615,
+   "last_active": 1780678652
+  }
+ }
+}

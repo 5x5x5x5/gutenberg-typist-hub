@@ -7,6 +7,10 @@ then put your stats on the board here.
 
 **The board: <https://5x5x5x5.github.io/typist-guild/>**
 
+The current residents are fictional — seed data, characters typing their own
+books (usernames like `mina-harker-1897` link nowhere on purpose). Every seat
+is takeable; their bundles get deleted as real typists arrive.
+
 ## Join the board
 
 No invite needed — fork, clone your fork, point `upstream` at this repo:

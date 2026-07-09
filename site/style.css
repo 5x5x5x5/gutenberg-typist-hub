@@ -213,6 +213,12 @@ tr.fold td {
   overflow-x: auto;
 }
 
+.seednote {
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+  margin: 10px 4px 0;
+}
+
 /* ── Empty / error states ───────────────────────── */
 
 .tildes {

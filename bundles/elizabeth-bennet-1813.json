@@ -1,0 +1,40 @@
+{
+ "format_version": 1,
+ "exported_at": 1783361372,
+ "machines": {
+  "framework13": {
+   "total_chars": 1346400,
+   "correct_chars": 1334282,
+   "total_time_seconds": 181764,
+   "sessions_count": 128,
+   "best_wpm": 104
+  },
+  "family-pc": {
+   "total_chars": 897600,
+   "correct_chars": 889522,
+   "total_time_seconds": 124236,
+   "sessions_count": 85,
+   "best_wpm": 95
+  }
+ },
+ "sessions": {
+  "1342": {
+   "offset": 679000,
+   "total_chars_typed": 719740,
+   "correct_chars": 713262,
+   "last_active": 1783357052
+  },
+  "158": {
+   "offset": 561000,
+   "total_chars_typed": 594660,
+   "correct_chars": 589308,
+   "last_active": 1782838652
+  },
+  "84": {
+   "offset": 417100,
+   "total_chars_typed": 442126,
+   "correct_chars": 438147,
+   "last_active": 1782320252
+  }
+ }
+}

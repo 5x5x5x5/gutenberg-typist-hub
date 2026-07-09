@@ -1,0 +1,27 @@
+{
+ "format_version": 1,
+ "exported_at": 1782583772,
+ "machines": {
+  "macbook-air": {
+   "total_chars": 417600,
+   "correct_chars": 392544,
+   "total_time_seconds": 85536,
+   "sessions_count": 60,
+   "best_wpm": 71
+  }
+ },
+ "sessions": {
+  "174": {
+   "offset": 334080,
+   "total_chars_typed": 354125,
+   "correct_chars": 332878,
+   "last_active": 1782579452
+  },
+  "1661": {
+   "offset": 83520,
+   "total_chars_typed": 88531,
+   "correct_chars": 83219,
+   "last_active": 1782061052
+  }
+ }
+}

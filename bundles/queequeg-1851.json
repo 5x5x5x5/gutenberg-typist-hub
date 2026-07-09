@@ -1,0 +1,21 @@
+{
+ "format_version": 1,
+ "exported_at": 1782238172,
+ "machines": {
+  "gaming-rig": {
+   "total_chars": 60000,
+   "correct_chars": 60240,
+   "total_time_seconds": 8865,
+   "sessions_count": 6,
+   "best_wpm": 96
+  }
+ },
+ "sessions": {
+  "2701": {
+   "offset": 60000,
+   "total_chars_typed": 63600,
+   "correct_chars": 63854,
+   "last_active": 1782233852
+  }
+ }
+}

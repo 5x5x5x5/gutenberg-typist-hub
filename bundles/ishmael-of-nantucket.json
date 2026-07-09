@@ -1,0 +1,53 @@
+{
+ "format_version": 1,
+ "exported_at": 1783611932,
+ "machines": {
+  "thinkpad-x220": {
+   "total_chars": 2044800,
+   "correct_chars": 2012083,
+   "total_time_seconds": 255600,
+   "sessions_count": 178,
+   "best_wpm": 118
+  },
+  "home-tower": {
+   "total_chars": 1226880,
+   "correct_chars": 1207250,
+   "total_time_seconds": 156427,
+   "sessions_count": 106,
+   "best_wpm": 109
+  },
+  "library-terminal": {
+   "total_chars": 817920,
+   "correct_chars": 804833,
+   "total_time_seconds": 101729,
+   "sessions_count": 71,
+   "best_wpm": 106
+  }
+ },
+ "sessions": {
+  "2701": {
+   "offset": 1164000,
+   "total_chars_typed": 1233840,
+   "correct_chars": 1214099,
+   "last_active": 1783607612
+  },
+  "1661": {
+   "offset": 562600,
+   "total_chars_typed": 596356,
+   "correct_chars": 586814,
+   "last_active": 1783089212
+  },
+  "98": {
+   "offset": 613440,
+   "total_chars_typed": 650246,
+   "correct_chars": 639842,
+   "last_active": 1782570812
+  },
+  "11": {
+   "offset": 145500,
+   "total_chars_typed": 154230,
+   "correct_chars": 151762,
+   "last_active": 1782052412
+  }
+ }
+}

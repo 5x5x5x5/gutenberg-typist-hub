@@ -1,0 +1,27 @@
+{
+ "format_version": 1,
+ "exported_at": 1781892572,
+ "machines": {
+  "school-chromebook": {
+   "total_chars": 159900,
+   "correct_chars": 145989,
+   "total_time_seconds": 47736,
+   "sessions_count": 32,
+   "best_wpm": 55
+  }
+ },
+ "sessions": {
+  "76": {
+   "offset": 143910,
+   "total_chars_typed": 152545,
+   "correct_chars": 139274,
+   "last_active": 1781888252
+  },
+  "120": {
+   "offset": 15990,
+   "total_chars_typed": 16949,
+   "correct_chars": 15474,
+   "last_active": 1781369852
+  }
+ }
+}
